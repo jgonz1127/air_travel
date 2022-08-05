@@ -51,7 +51,7 @@ while days > 0:
 # FLIGHT LANDING TIME
     if flight_occured:
         if(curr_time == flight_land_time):
-            print("Flight landed at ", flight_land_time)
+            print("Flight landed at ", flight_land_time, " and was ", new_flight.flight_length)
 
 
 # ENDS CYCLE
