@@ -75,7 +75,6 @@ def run_airport(days, curr_time, cursor):
     # START OF DAY
         flight_occured = False
         landing_occured = False
-
         time.sleep(speed_of_time)
 
         flight_percent_chance = random.randint(0, 10) #NUMBER OF GUESSES
@@ -86,7 +85,7 @@ def run_airport(days, curr_time, cursor):
             id_for_flight = get_flight_id(cursor)
             
             flight_occurs(curr_time, pilot_for_flight, id_for_flight)
-            flight_occured = True
+            flight_occured = True #CHECK LOGIC HERE
 
 # FLIGHT LANDS
         for x in range(0, len(flight_list), 1):
@@ -99,7 +98,8 @@ def run_airport(days, curr_time, cursor):
             print(curr_time, ":")
 
         curr_time = curr_time + 1
-    # ENDS CYCLE
+
+# ENDS CYCLE
         if ((days * 24) + 1 == curr_time): 
             days = 0
 
