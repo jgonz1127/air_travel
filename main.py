@@ -4,10 +4,20 @@ import random
 curr_time = 0
 speed_of_time = 1
 
-class flight:
+class Flight:
     def __init__(self, flight_length):
         self.flight_length = flight_length
+
 # EXPAND object WITH DATA BASE SUCH AS flight_id, num_passengers etc...
+def NOR(a, b):
+    if(a == 0) and (b == 0):
+        return 1
+    elif(a == 0) and (b == 1):
+        return 0
+    elif(a == 1) and (b == 0):
+        return 0
+    elif(a == 1) and (b == 1):
+        return 0
 
 def if_flight(flight_percent_chance):
     list_of_guesses = []
@@ -27,9 +37,8 @@ def if_flight(flight_percent_chance):
 
 
 def flight_occurs(curr_time):
-    print("Flight length of ", new_flight.flight_length)
+    print(curr_time, ":" ,"TAKE-OFF: Flight_id", id(new_flight), "with a length of", new_flight.flight_length)
     return new_flight.flight_length + curr_time
-
 
 # days = input("How many days of flights would you like to observe: ")
 
@@ -38,22 +47,27 @@ days = 0.5
 
 while days > 0:
 # START OF DAY
-    print(curr_time)
-    curr_time = curr_time + 1
+    flight_occured = False
+    landing_occured = False
+
     time.sleep(speed_of_time)
 
     flight_percent_chance = random.randint(0, 10) #NUMBER OF GUESSES
     if (if_flight(flight_percent_chance)): #FLIGHT OCCURS
-        new_flight = flight(random.randint(0, 24))
+        # CREATE FLIGHT flight(flight_length)
+        new_flight = Flight(random.randint(0, 5)) 
         flight_land_time = flight_occurs(curr_time)
         flight_occured = True
 
 # FLIGHT LANDING TIME
-    if flight_occured:
-        if(curr_time == flight_land_time):
-            print("Flight landed at ", flight_land_time, " and was ", new_flight.flight_length)
+    if flight_occured and (curr_time ==  flight_land_time):
+        print(curr_time, ":" ,"LANDING: Flight_id", id(new_flight), " landed at ", flight_land_time)
+        landing_occured = True
 
+    if NOR(flight_occured, landing_occured):
+        print(curr_time, ":")
 
+    curr_time = curr_time + 1
 # ENDS CYCLE
     if ((days * 24) + 1 == curr_time): 
         days = 0
