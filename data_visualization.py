@@ -40,8 +40,8 @@ def graph_num_flight_per_day(flight_list, days,current_day):
     plt.ylabel("avg_flight_length")
     x = np.array(day_list)
     y = np.array(daily_avg_flight_length)
-   
-    print(days, " and ", current_day)
+
     if days == current_day:
         plt.bar(x,y)
+        # MAKE A GROUPED BAR GRAPH SHOWING NUMBER OF FLIGHTS
         return(plt.show())
