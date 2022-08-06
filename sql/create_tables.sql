@@ -39,10 +39,9 @@ CREATE TABLE PLANE_TYPE (
 );
 
 CREATE TABLE FLIGHT (
-  flight_num INT NOT NULL, 
+  flight_num VARCHAR(6) NOT NULL, 
   origin VARCHAR(3) NOT NULL, 
   dest VARCHAR(3) NOT NULL, 
-  dep_date VARCHAR(20) NOT NULL,
   dep_time VARCHAR(5) NOT NULL, 
   arr_time VARCHAR(5) NOT NULL, 
   PRIMARY KEY (flight_num)
@@ -58,7 +57,7 @@ CREATE TABLE AIRCRAFT (
 CREATE TABLE BOOKED_ON (
   customer_name VARCHAR(25) NOT NULL, 
   departure_date VARCHAR(25) NOT NULL, 
-  flight_num  INT NOT NULL,
+  flight_num VARCHAR(6) NOT NULL, 
   FOREIGN KEY (flight_num) REFERENCES FLIGHT(flight_num)
 );
 
@@ -81,7 +80,7 @@ CREATE TABLE DEPARTURE (
 
 CREATE TABLE ASSSIGNED_TO (
   employee_id INT NOT NULL, 
-  flight_num INT NOT NULL,
+  flight_num VARCHAR(6) NOT NULL, 
   FOREIGN KEY (employee_id) REFERENCES EMPLOYEE(employee_id),
   FOREIGN KEY (flight_num) REFERENCES FLIGHT(flight_num)
 );

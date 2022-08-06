@@ -350,3 +350,4 @@ insert into PILOT (employee_id, pilot_name, license_date, plane_model_can_fly) v
 insert into PILOT (employee_id, pilot_name, license_date, plane_model_can_fly) values (350, 'Ariel Cotgrove', '2/28/2022', '737-800');
 insert into PILOT (employee_id, pilot_name, license_date, plane_model_can_fly) values (351, 'Yvonne Dakhno', '5/8/2022', 'A321');
 insert into PILOT (employee_id, pilot_name, license_date, plane_model_can_fly) values (352, 'Whitaker Firebrace', '7/1/2022', 'A320');
+insert into PILOT (employee_id, pilot_name, license_date, plane_model_can_fly) values (353, 'Justyn Liranzo', '4/25/2002', 'A321');

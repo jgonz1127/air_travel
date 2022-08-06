@@ -15,11 +15,14 @@ def connect_db():
         return("Failed to connect to DB")
 
 class Flight:
-    def __init__(self, flight_length, pilot, curr_time, flight_id):
+    def __init__(self, flight_length, pilot, curr_time, flight_num, flight_origin, flight_destination, arr_time):
         self.flight_length = flight_length
         self.pilot = pilot
         self.flight_land_time = flight_length + curr_time
-        self.flight_id = flight_id
+        self.flight_num = flight_num
+        self.flight_origin = flight_origin
+        self.flight_destination = flight_destination
+        self.arr_time = arr_time
 
 # EXPAND object WITH DATA BASE SUCH AS flight_id, num_passengers etc...
 def nor(a, b):
@@ -48,28 +51,34 @@ def if_flight(flight_percent_chance):
         # print("No match found ", number_to_guess, " and ", list_of_guesses)
         return False
 
-def flight_occurs(curr_time, pilot_name, id_for_flight):
-    new_flight = Flight(random.randint(0, 5), pilot_name, curr_time, id_for_flight) 
+# CREATES FLIGHT
+def flight_occurs(curr_time, pilot_name, id_for_flight, flight_origin, flight_destination, arr_time):
+    new_flight = Flight(random.randint(0, 5), pilot_name, curr_time, id_for_flight, flight_origin, flight_destination, arr_time) 
     flight_list.append(new_flight)
     print(curr_time, ": TAKE-OFF: Flight_id", id_for_flight, "\n    Pilot:", pilot_name,"\n    Flight_length:", new_flight.flight_length,
     "\n    Flight_land_time:", new_flight.flight_land_time)
     return new_flight.flight_length + curr_time
 
-employee_id = 352
+
 def assign_pilot(cursor, employee_id):
     cursor.execute("SELECT pilot_name FROM PILOT WHERE employee_id = %(employee_id)s", {"employee_id": employee_id} )
     pilot = cursor.fetchall()
     pilot = ''.join(pilot[0])
     pilot = pilot.strip("()',")
-    return(pilot)
+    return pilot
 
-def get_flight_id(cursor):
-    # CREATE THE FLIGHT HERE AND ADD IT TO THE DB
-    # FLIGHT NEEDS (FLIGHT_NUM, ORIGIN, DEST, DEP_DATE, DEP_TIME, ARR_TIME)
-    return 1
+
+def get_flight_num(cursor, flight_index):
+    cursor.execute("SELECT flight_num FROM flight")
+    flight_num = cursor.fetchall()
+    flight_num = ''.join(flight_num[flight_index])
+    flight_num = flight_num.strip("()',")
+    return flight_num
+
 
 def run_airport(days, curr_time, cursor):
     employee_id = 352
+    flight_index = 99
 
     while days > 0:
     # START OF DAY
@@ -82,16 +91,19 @@ def run_airport(days, curr_time, cursor):
         if (if_flight(flight_percent_chance)):
             pilot_for_flight = assign_pilot(cursor, employee_id)
             employee_id = employee_id - 1
-            id_for_flight = get_flight_id(cursor)
-            
-            flight_occurs(curr_time, pilot_for_flight, id_for_flight)
+
+
+            flight_num = get_flight_num(cursor, flight_index)
+            flight_index = flight_index - 1
+# CREATES FLIGHT
+            flight_occurs(curr_time, pilot_for_flight, flight_num, 0, 0, 0)
             flight_occured = True #CHECK LOGIC HERE
 
 # FLIGHT LANDS
         for x in range(0, len(flight_list), 1):
             # print(curr_time, " and ", flight_list[x].flight_land_time)
             if curr_time == flight_list[x].flight_land_time:
-                print(curr_time, ":" ,"LANDING: Flight_id", flight_list[x].flight_id, " landed at ", flight_list[x].flight_land_time)
+                print(curr_time, ":" ,"LANDING: Flight_id", flight_list[x].flight_num, " landed at ", flight_list[x].flight_land_time)
                 landing_occured = True
 
         if nor(flight_occured, landing_occured):
