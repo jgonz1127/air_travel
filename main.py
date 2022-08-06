@@ -1,7 +1,7 @@
 import time
 import random
 import psycopg2
-
+from data_visualization import average_flight_length, graph_flight_times
 # CONNECT TO DATABASE
 def connect_db():
     try:
@@ -18,6 +18,9 @@ class Flight:
         self.flight_num = flight_num
         self.flight_origin = flight_origin
         self.flight_destination = flight_destination
+    def __str__(self):
+        # CAN ADD MORE TO STR
+        return (self)
         
 
 # EXPAND object WITH DATA BASE SUCH AS flight_id, num_passengers etc...
@@ -117,20 +120,26 @@ def run_airport(days, curr_time, cursor):
 
         curr_time = curr_time + 1
 
+# DAY CYCLE
+        # if(24 % curr_time):
+
+
 # ENDS CYCLE
-        if ((days * 24) + 1 == curr_time): 
+        if ((days * 24) + 1 == curr_time):
+            print("average_flight_length: ", average_flight_length(flight_list))
+            graph_flight_times(flight_list)
             days = 0
 
     print("Total flights:", len(flight_list))
 
 
 curr_time = 0
-speed_of_time = 1
+speed_of_time = 0.5
 flight_list = []
 conn = connect_db()
 cursor = conn.cursor()
 # days = input("How many days of flights would you like to observe: ")
 # STUCK TO 12 HOURS FOR TESTING
-days = 0.5 
+days = 1
 
 run_airport(days, curr_time, cursor)
