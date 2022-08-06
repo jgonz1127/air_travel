@@ -2,27 +2,23 @@ import time
 import random
 import psycopg2
 
-curr_time = 0
-speed_of_time = 1
-flight_list = []
-
 # CONNECT TO DATABASE
 def connect_db():
     try:
         conn = psycopg2.connect(database="airport", user='postgres', password='0167174jg', host='127.0.0.1', port= '5432')
         return(conn)
-    except:
+    except psycopg2.Error:
         return("Failed to connect to DB")
 
 class Flight:
-    def __init__(self, flight_length, pilot, curr_time, flight_num, flight_origin, flight_destination, arr_time):
+    def __init__(self, flight_length, pilot, curr_time, flight_num, flight_origin, flight_destination):
         self.flight_length = flight_length
         self.pilot = pilot
         self.flight_land_time = flight_length + curr_time
         self.flight_num = flight_num
         self.flight_origin = flight_origin
         self.flight_destination = flight_destination
-        self.arr_time = arr_time
+        
 
 # EXPAND object WITH DATA BASE SUCH AS flight_id, num_passengers etc...
 def nor(a, b):
@@ -52,13 +48,12 @@ def if_flight(flight_percent_chance):
         return False
 
 # CREATES FLIGHT
-def flight_occurs(curr_time, pilot_name, id_for_flight, flight_origin, flight_destination, arr_time):
-    new_flight = Flight(random.randint(0, 5), pilot_name, curr_time, id_for_flight, flight_origin, flight_destination, arr_time) 
+def flight_occurs(curr_time, pilot_name, id_for_flight, flight_origin, flight_destination):
+    new_flight = Flight(random.randint(0, 5), pilot_name, curr_time, id_for_flight, flight_origin, flight_destination) 
     flight_list.append(new_flight)
     print(curr_time, ": TAKE-OFF: Flight_id", id_for_flight, "\n    Pilot:", pilot_name,"\n    Flight_length:", new_flight.flight_length,
     "\n    Flight_land_time:", new_flight.flight_land_time)
     return new_flight.flight_length + curr_time
-
 
 def assign_pilot(cursor, employee_id):
     cursor.execute("SELECT pilot_name FROM PILOT WHERE employee_id = %(employee_id)s", {"employee_id": employee_id} )
@@ -67,7 +62,6 @@ def assign_pilot(cursor, employee_id):
     pilot = pilot.strip("()',")
     return pilot
 
-
 def get_flight_num(cursor, flight_index):
     cursor.execute("SELECT flight_num FROM flight")
     flight_num = cursor.fetchall()
@@ -75,6 +69,12 @@ def get_flight_num(cursor, flight_index):
     flight_num = flight_num.strip("()',")
     return flight_num
 
+def get_flight_origin(cursor, flight_index):
+    cursor.execute("SELECT origin FROM flight")
+    flight_origin = cursor.fetchall()
+    flight_origin = ''.join(flight_origin[flight_index])
+    flight_origin = flight_origin.strip("()',")
+    return flight_origin
 
 def run_airport(days, curr_time, cursor):
     employee_id = 352
@@ -89,14 +89,20 @@ def run_airport(days, curr_time, cursor):
         flight_percent_chance = random.randint(0, 10) #NUMBER OF GUESSES
 # FLIGHT TAKES OFF
         if (if_flight(flight_percent_chance)):
+            # PILOT
             pilot_for_flight = assign_pilot(cursor, employee_id)
             employee_id = employee_id - 1
-
-
+            # FLIGHT_NUM
             flight_num = get_flight_num(cursor, flight_index)
-            flight_index = flight_index - 1
+            # FLIGHT_ORIGIN
+            flight_origin = get_flight_origin(cursor, flight_index)
+            # FLIGHT_DESTINATION
+            flight_destination = get_flight_origin(cursor, flight_index)
+            # MOVES TO THE NEXT ROW OF DATA
+            flight_index = flight_index - 1 
+
 # CREATES FLIGHT
-            flight_occurs(curr_time, pilot_for_flight, flight_num, 0, 0, 0)
+            flight_occurs(curr_time, pilot_for_flight, flight_num, flight_origin, flight_destination)
             flight_occured = True #CHECK LOGIC HERE
 
 # FLIGHT LANDS
@@ -115,8 +121,12 @@ def run_airport(days, curr_time, cursor):
         if ((days * 24) + 1 == curr_time): 
             days = 0
 
-    print("Total flights:",len(flight_list))
+    print("Total flights:", len(flight_list))
 
+
+curr_time = 0
+speed_of_time = 1
+flight_list = []
 conn = connect_db()
 cursor = conn.cursor()
 # days = input("How many days of flights would you like to observe: ")
