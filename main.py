@@ -24,7 +24,6 @@ class Flight:
         # CAN ADD MORE TO STR
         return (self)
         
-
 # EXPAND object WITH DATA BASE SUCH AS flight_id, num_passengers etc...
 def nor(a, b):
     if(a == 0) and (b == 0):
@@ -56,7 +55,6 @@ def update_flight_data(cursor, id_for_flight, flight_land_time, flight_dep_time)
     cursor.execute("UPDATE flight SET dep_time = %(flight_dep_time)s WHERE flight_num = %(id_for_flight)s", {"id_for_flight": id_for_flight, "flight_dep_time": flight_dep_time})
     cursor.execute("UPDATE flight SET arr_time = %(flight_land_time)s WHERE flight_num = %(id_for_flight)s", {"id_for_flight": id_for_flight, "flight_land_time": flight_land_time})
 
-
 # CREATES FLIGHT
 def flight_occurs(curr_time, pilot_name, flight_num, flight_origin, flight_destination, cursor):
     new_flight = Flight(random.randint(0, 5), pilot_name, curr_time, flight_num, flight_origin, flight_destination, curr_time) 
@@ -67,6 +65,20 @@ def flight_occurs(curr_time, pilot_name, flight_num, flight_origin, flight_desti
     update_flight_data(cursor, new_flight.flight_num, new_flight.flight_land_time, new_flight.flight_dep_time)
 
     return new_flight.flight_length + curr_time
+
+def assign_passengers_flight(cursor, curr_time, flight_num):
+    # USING PASSENGER WILL add values to BOOKED ON
+    num_of_passengers = random.randint(15, 150)
+
+    for x in range(0, num_of_passengers, 1):
+        # FIX syntax
+        customer_name = passenger_first_name + passenger_last_name
+        cursor.execute
+        ("INSERT INTO booked_on (customer_name, departure_time, flight_num)VALUES (%(customer_name)s, %(departure_time)s, %(flight_num)s)",
+        {"customer_name":customer_name, "departure_time":curr_time, "flight_num":flight_num})
+        
+    
+    return 0
 
 def assign_pilot(cursor, employee_id):
     cursor.execute("SELECT pilot_name FROM PILOT WHERE employee_id = %(employee_id)s", {"employee_id": employee_id} )
@@ -158,8 +170,6 @@ days = 5
 run_airport(days, curr_time, cursor)
 
 # ADD DATA VISUALIZATION SUCH AS
-# 
 # HOW MUCH THE EMPLOYEES MAKE ON THE FLIGHT THEYRE ON
 # HOW MANY PASSENGERS ON PLANE AVERAGE AND SCATTER PLOT
 # HOW MANY FLIGHTS EACH DAY BAR GRAPH
-# 

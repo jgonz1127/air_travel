@@ -56,16 +56,17 @@ CREATE TABLE AIRCRAFT (
 
 CREATE TABLE BOOKED_ON (
   customer_name VARCHAR(25) NOT NULL, 
-  departure_date VARCHAR(25) NOT NULL, 
+  Departure_time CHAR(11) NOT NULL,  
   flight_num VARCHAR(6) NOT NULL, 
   FOREIGN KEY (flight_num) REFERENCES FLIGHT(flight_num)
 );
 
-CREATE TABLE PASSNGER (
+CREATE TABLE PASSENGER (
   first_name VARCHAR(25) NOT NULL, 
   last_name VARCHAR(25) NOT NULL, 
-  street VARCHAR(20) NOT NULL, 
-  city VARCHAR(20) NOT NULL, 
+  street VARCHAR(40) NOT NULL, 
+  city VARCHAR(30) NOT NULL, 
+  gender VARCHAR(25) NOT NULL,
   p_state CHAR(2) NOT NULL, 
   zip_code INT NOT NULL, 
   id VARCHAR(12) NOT NULL, 
@@ -73,9 +74,10 @@ CREATE TABLE PASSNGER (
 );
 
 CREATE TABLE DEPARTURE (
-  Departure_Date CHAR(11) NOT NULL, 
-  Flight_Number INT NOT NULL, 
-  Aircraft_serial_no VARCHAR(5)
+  Departure_time CHAR(11) NOT NULL, 
+  flight_num VARCHAR(6) NOT NULL,
+  Aircraft_serial_no VARCHAR(5),
+  FOREIGN KEY (flight_num) REFERENCES FLIGHT(flight_num)
 );
 
 CREATE TABLE ASSSIGNED_TO (

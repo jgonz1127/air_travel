@@ -43,5 +43,4 @@ def graph_num_flight_per_day(flight_list, days,current_day):
 
     if days == current_day:
         plt.bar(x,y)
-        # MAKE A GROUPED BAR GRAPH SHOWING NUMBER OF FLIGHTS
         return(plt.show())
