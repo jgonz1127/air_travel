@@ -1,19 +1,21 @@
 import time
 import random
 import psycopg2
-from data_visualization import average_flight_length, graph_flight_times
+from data_visualization import average_flight_length, graph_flight_times, graph_num_flight_per_day
 # CONNECT TO DATABASE
 def connect_db():
     try:
         conn = psycopg2.connect(database="airport", user='postgres', password='0167174jg', host='127.0.0.1', port= '5432')
+        conn.autocommit=True
         return(conn)
     except psycopg2.Error:
         return("Failed to connect to DB")
 
 class Flight:
-    def __init__(self, flight_length, pilot, curr_time, flight_num, flight_origin, flight_destination):
+    def __init__(self, flight_length, pilot, curr_time, flight_num, flight_origin, flight_destination, flight_dep_time):
         self.flight_length = flight_length
         self.pilot = pilot
+        self.flight_dep_time = flight_dep_time
         self.flight_land_time = flight_length + curr_time
         self.flight_num = flight_num
         self.flight_origin = flight_origin
@@ -50,12 +52,20 @@ def if_flight(flight_percent_chance):
         # print("No match found ", number_to_guess, " and ", list_of_guesses)
         return False
 
+def update_flight_data(cursor, id_for_flight, flight_land_time, flight_dep_time):
+    cursor.execute("UPDATE flight SET dep_time = %(flight_dep_time)s WHERE flight_num = %(id_for_flight)s", {"id_for_flight": id_for_flight, "flight_dep_time": flight_dep_time})
+    cursor.execute("UPDATE flight SET arr_time = %(flight_land_time)s WHERE flight_num = %(id_for_flight)s", {"id_for_flight": id_for_flight, "flight_land_time": flight_land_time})
+
+
 # CREATES FLIGHT
-def flight_occurs(curr_time, pilot_name, id_for_flight, flight_origin, flight_destination):
-    new_flight = Flight(random.randint(0, 5), pilot_name, curr_time, id_for_flight, flight_origin, flight_destination) 
+def flight_occurs(curr_time, pilot_name, flight_num, flight_origin, flight_destination, cursor):
+    new_flight = Flight(random.randint(0, 5), pilot_name, curr_time, flight_num, flight_origin, flight_destination, curr_time) 
     flight_list.append(new_flight)
-    print(curr_time, ": TAKE-OFF: Flight_id", id_for_flight, "\n    Pilot:", pilot_name,"\n    Flight_length:", new_flight.flight_length,
+    print(curr_time, ": TAKE-OFF: Flight_num", flight_num, "\n    Pilot:", pilot_name,"\n    Flight_length:", new_flight.flight_length,
     "\n    Flight_land_time:", new_flight.flight_land_time)
+
+    update_flight_data(cursor, new_flight.flight_num, new_flight.flight_land_time, new_flight.flight_dep_time)
+
     return new_flight.flight_length + curr_time
 
 def assign_pilot(cursor, employee_id):
@@ -105,7 +115,8 @@ def run_airport(days, curr_time, cursor):
             flight_index = flight_index - 1 
 
 # CREATES FLIGHT
-            flight_occurs(curr_time, pilot_for_flight, flight_num, flight_origin, flight_destination)
+            flight_occurs(curr_time, pilot_for_flight, flight_num, flight_origin, flight_destination, cursor)
+
             flight_occured = True #CHECK LOGIC HERE
 
 # FLIGHT LANDS
@@ -120,9 +131,11 @@ def run_airport(days, curr_time, cursor):
 
         curr_time = curr_time + 1
 
-# DAY CYCLE
-        # if(24 % curr_time):
-
+# START NEW DAY
+        if (curr_time != 0) and (curr_time % 24 == 0):
+            current_day = curr_time / 24
+            print("--NEW DAY--")
+            graph_num_flight_per_day(flight_list, days, current_day)
 
 # ENDS CYCLE
         if ((days * 24) + 1 == curr_time):
@@ -134,18 +147,18 @@ def run_airport(days, curr_time, cursor):
 
 
 curr_time = 0
-speed_of_time = 0.5
+speed_of_time = 0
 flight_list = []
 conn = connect_db()
 cursor = conn.cursor()
 # days = input("How many days of flights would you like to observe: ")
 # STUCK TO 12 HOURS FOR TESTING
-days = 1
+days = 5
 
 run_airport(days, curr_time, cursor)
 
-
-# ADD CRAZY DATA VISUALIZATION SUCH AS
+# ADD DATA VISUALIZATION SUCH AS
+# 
 # HOW MUCH THE EMPLOYEES MAKE ON THE FLIGHT THEYRE ON
 # HOW MANY PASSENGERS ON PLANE AVERAGE AND SCATTER PLOT
 # HOW MANY FLIGHTS EACH DAY BAR GRAPH
