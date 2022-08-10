@@ -27,7 +27,7 @@ def graph_flight_times(flight_list):
 
 daily_avg_flight_length = []
 day_list = []
-def graph_num_flight_per_day(flight_list, days,current_day):
+def graph_avg_flight_length_per_day(flight_list, days,current_day):
     total = 0
     for x in range(0, len(flight_list), 1):
         # CALCUALTE DAILY AVERAGE
@@ -47,7 +47,7 @@ def graph_num_flight_per_day(flight_list, days,current_day):
 
 total_passengers_list = []
 passenger_day_list = []
-def graph_num_of_passengers_per_day(flight_list, days, current_day):
+def graph_num_of_passengers(flight_list, days, current_day):
     total_passengers = 0
 
     for x in range(0, len(flight_list), 1):

@@ -1,7 +1,7 @@
 import time
 import random
 import psycopg2
-from data_visualization import average_flight_length, graph_flight_times, graph_num_flight_per_day, graph_num_of_passengers_per_day
+from data_visualization import average_flight_length, graph_flight_times, graph_avg_flight_length_per_day, graph_num_of_passengers
 # CONNECT TO DATABASE
 def connect_db():
     try:
@@ -61,7 +61,7 @@ def flight_occurs(curr_time, pilot_name, flight_num, flight_origin, flight_desti
 
     num_of_passengers = assign_passengers_flight(cursor, curr_time, flight_num)
     new_flight = Flight(random.randint(0, 5), pilot_name, curr_time, flight_num, flight_origin, flight_destination, curr_time, num_of_passengers) 
-    
+    # departure(departure_time, flight_num, aircraft)
     flight_list.append(new_flight)
     print(curr_time, ": TAKE-OFF: Flight_num", flight_num, "\n    Pilot:", pilot_name,"\n    Flight_length:", new_flight.flight_length,
     "\n    Flight_land_time:", new_flight.flight_land_time, "\n   Num_of_passengers:", num_of_passengers)
@@ -155,8 +155,8 @@ def run_airport(days, curr_time, cursor):
         if (curr_time != 0) and (curr_time % 24 == 0):
             current_day = curr_time / 24
             print("--NEW DAY--")
-            graph_num_flight_per_day(flight_list, days, current_day)
-            graph_num_of_passengers_per_day(flight_list, days, current_day)
+            graph_avg_flight_length_per_day(flight_list, days, current_day)
+            graph_num_of_passengers(flight_list, days, current_day)
 
 # ENDS CYCLE
         if ((days * 24) + 1 == curr_time):
