@@ -1,7 +1,7 @@
 import time
 import random
 import psycopg2
-from data_visualization import average_flight_length, graph_flight_times, graph_num_flight_per_day
+from data_visualization import average_flight_length, graph_flight_times, graph_num_flight_per_day, graph_num_of_passengers_per_day
 # CONNECT TO DATABASE
 def connect_db():
     try:
@@ -12,7 +12,7 @@ def connect_db():
         return("Failed to connect to DB")
 
 class Flight:
-    def __init__(self, flight_length, pilot, curr_time, flight_num, flight_origin, flight_destination, flight_dep_time):
+    def __init__(self, flight_length, pilot, curr_time, flight_num, flight_origin, flight_destination, flight_dep_time, num_of_passengers):
         self.flight_length = flight_length
         self.pilot = pilot
         self.flight_dep_time = flight_dep_time
@@ -20,6 +20,7 @@ class Flight:
         self.flight_num = flight_num
         self.flight_origin = flight_origin
         self.flight_destination = flight_destination
+        self.num_of_passengers = num_of_passengers
     def __str__(self):
         # CAN ADD MORE TO STR
         return (self)
@@ -57,10 +58,13 @@ def update_flight_data(cursor, id_for_flight, flight_land_time, flight_dep_time)
 
 # CREATES FLIGHT
 def flight_occurs(curr_time, pilot_name, flight_num, flight_origin, flight_destination, cursor):
-    new_flight = Flight(random.randint(0, 5), pilot_name, curr_time, flight_num, flight_origin, flight_destination, curr_time) 
+
+    num_of_passengers = assign_passengers_flight(cursor, curr_time, flight_num)
+    new_flight = Flight(random.randint(0, 5), pilot_name, curr_time, flight_num, flight_origin, flight_destination, curr_time, num_of_passengers) 
+    
     flight_list.append(new_flight)
     print(curr_time, ": TAKE-OFF: Flight_num", flight_num, "\n    Pilot:", pilot_name,"\n    Flight_length:", new_flight.flight_length,
-    "\n    Flight_land_time:", new_flight.flight_land_time)
+    "\n    Flight_land_time:", new_flight.flight_land_time, "\n   Num_of_passengers:", num_of_passengers)
 
     update_flight_data(cursor, new_flight.flight_num, new_flight.flight_land_time, new_flight.flight_dep_time)
 
@@ -68,17 +72,21 @@ def flight_occurs(curr_time, pilot_name, flight_num, flight_origin, flight_desti
 
 def assign_passengers_flight(cursor, curr_time, flight_num):
     # USING PASSENGER WILL add values to BOOKED ON
-    num_of_passengers = random.randint(15, 150)
-
-    for x in range(0, num_of_passengers, 1):
-        # FIX syntax
-        customer_name = passenger_first_name + passenger_last_name
-        cursor.execute
-        ("INSERT INTO booked_on (customer_name, departure_time, flight_num)VALUES (%(customer_name)s, %(departure_time)s, %(flight_num)s)",
-        {"customer_name":customer_name, "departure_time":curr_time, "flight_num":flight_num})
-        
+    num_of_passengers_on_flight = random.randint(15, 150)
+    passenger_list = []
+    cursor.execute("SELECT first_name, last_name FROM passenger LIMIT %(num_of_passengers_on_flight)s",{"num_of_passengers_on_flight":num_of_passengers_on_flight})
     
-    return 0
+    for x in range(0, num_of_passengers_on_flight, 1):
+        passenger_list.append(cursor.fetchmany(1))
+    
+    for x in range(0, len(passenger_list), 1):
+        customer_name = passenger_list[x]
+        customer_name = ' '.join(customer_name[0])
+        customer_name = customer_name.strip("()'")
+        cursor.execute("INSERT INTO booked_on (customer_name, departure_time, flight_num) VALUES (%(customer_name)s, %(departure_time)s, %(flight_num)s)",{"customer_name":customer_name, "departure_time":curr_time, "flight_num":flight_num})
+        conn.commit()
+    
+    return num_of_passengers_on_flight
 
 def assign_pilot(cursor, employee_id):
     cursor.execute("SELECT pilot_name FROM PILOT WHERE employee_id = %(employee_id)s", {"employee_id": employee_id} )
@@ -148,6 +156,7 @@ def run_airport(days, curr_time, cursor):
             current_day = curr_time / 24
             print("--NEW DAY--")
             graph_num_flight_per_day(flight_list, days, current_day)
+            graph_num_of_passengers_per_day(flight_list, days, current_day)
 
 # ENDS CYCLE
         if ((days * 24) + 1 == curr_time):

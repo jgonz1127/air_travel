@@ -44,3 +44,23 @@ def graph_num_flight_per_day(flight_list, days,current_day):
     if days == current_day:
         plt.bar(x,y)
         return(plt.show())
+
+total_passengers_list = []
+passenger_day_list = []
+def graph_num_of_passengers_per_day(flight_list, days, current_day):
+    total_passengers = 0
+
+    for x in range(0, len(flight_list), 1):
+        total_passengers = total_passengers + flight_list[x].num_of_passengers
+    
+    total_passengers_list.append(total_passengers)
+    passenger_day_list.append(current_day)
+
+    plt.xlabel("day")
+    plt.ylabel("num_of_passengers")
+    x = np.array(day_list)
+    y = np.array(total_passengers_list)
+
+    if days == current_day:
+        plt.bar(x,y)
+        return(plt.show())
